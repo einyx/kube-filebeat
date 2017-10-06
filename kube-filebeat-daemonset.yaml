@@ -2,22 +2,32 @@ apiVersion: extensions/v1beta1
 kind: DaemonSet
 metadata:
   name: "kube-filebeat"
+  labels:
+    k8s-app: filebeat
   annotations:
     description: "automated log shipper powered by annotations"
 spec:
   template:
+    metadata:
+      name: filebeat
+      labels:
+        component: filebeat
+        app: filebeat
     spec:
+      serviceAccountName: jenkins
+      serviceAccount: jenkins
       containers:
         -
           name: "kube-filebeat"
-          image: "kylemcc/kube-filebeat:latest"
+          imagePullPolicy: Always
+          image: "einyx/annotation-beat:latest"
           env:
             -
               name: LOGSTASH_HOSTS
-              value:  logstash.default.svc.cluster.local:5044
+              value:  elk.default.svc.cluster.local:5044
             -
               name: KUBERNETES_API_URL
-              value: http://10.1.2.3:8080
+              value: https://kubernetes:6443
           volumeMounts:
             - name: docker
               mountPath: /var/lib/docker

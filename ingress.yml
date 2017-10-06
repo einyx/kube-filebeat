@@ -1,0 +1,20 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    ingress.kubernetes.io/auth-type: basic
+    ingress.kubernetes.io/auth-secret: haproxy-auth
+  name: elk
+spec:
+  tls:
+  - hosts:
+    - elk.example<Plug>(neosnippet_expand)
+    secretName: tls-secret
+  rules:
+  - host: elk.example
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: elk
+          servicePort: 5601
