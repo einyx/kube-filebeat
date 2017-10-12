@@ -19,6 +19,7 @@ filebeat:
 
       input_type: log
 
+
       # Exclude files. A list of regular expressions to match. Default NO drops.
 {{- if hasField $conf "exclude_files" }}
       exclude_files:
@@ -45,10 +46,10 @@ filebeat:
         path: {{ $conf.log }}
         pod: {{ $pod.ObjectMeta.Name }}
         namespace: {{ $pod.ObjectMeta.Namespace }}
+        tags: {{ $conf.tags }}
 {{- range $key, $value := $conf.fields }}
         {{ $key }}: {{ $value }}
 {{- end }}{{/* end range fields */}}
-        tags: {{ $conf.tags }}
 
       fields_under_root: true
 
@@ -71,23 +72,23 @@ filebeat:
 {{- end }}{{/* end range $pods */}}
 
   # Defines how often the spooler is flushed.
-  idle_timeout: 5s
+      idle_timeout: 5s
 
+
+output:
 # Configure what outputs to use when sending the data collected by the beat.
 {{- if mapContains .Env "LOGSTASH_HOSTS" }}
   logstash:
     # The Logstash hosts
     hosts:
-	{{- range $host := split .Env.LOGSTASH_HOSTS "," }}
+      {{- range $host := split .Env.LOGSTASH_HOSTS "," }}
       - {{ $host }}
-	{{- end }}
+      {{- end }}
 
     worker: 1
     compression_level: 3
     loadbalance: true
 
-    # Optional index name. The default index name depends on the each beat.
-    #index: filebeat
 {{ end -}}
 {{- if mapContains .Env "CONSOLE_OUTPUT" }}
   console:
